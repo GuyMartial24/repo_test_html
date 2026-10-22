@@ -198,7 +198,7 @@
 
             <div class="grid">
                 <div class="card">
-                    <h3>🧪 lint-and-test (CI)</h3>
+                    <h3>lint-and-test (CI)</h3>
                     <ul>
                         <li>Déclenché à chaque push sur <code>main</code> / <code>develop</code> et à chaque PR vers <code>main</code></li>
                         <li>Vérifie la présence du <code>README.md</code></li>
@@ -207,7 +207,7 @@
                     </ul>
                 </div>
                 <div class="card">
-                    <h3>🚀 deploy-pages (CD)</h3>
+                    <h3>deploy-pages (CD)</h3>
                     <ul>
                         <li>Dépend du succès de la CI (<code>needs: lint-and-test</code>)</li>
                         <li>Exécuté uniquement lors d'un push sur <code>main</code></li>
@@ -240,19 +240,19 @@
 
             <div class="grid">
                 <div class="card">
-                    <h3>🌿 Workflow Git</h3>
+                    <h3>Workflow Git</h3>
                     <p>Branche <code>develop</code> pour le travail courant, <code>main</code> pour la production. Intégration uniquement via Pull Request.</p>
                 </div>
                 <div class="card">
-                    <h3>🔒 Moindre privilège</h3>
+                    <h3>Moindre privilège</h3>
                     <p>Permissions du <code>GITHUB_TOKEN</code> limitées au strict nécessaire : <code>contents: read</code>, <code>pages: write</code>, <code>id-token: write</code>.</p>
                 </div>
                 <div class="card">
-                    <h3>🚦 Quality gate</h3>
+                    <h3>Quality gate</h3>
                     <p>Le déploiement est bloqué tant que la CI n'est pas au vert : aucun code invalide n'atteint la production.</p>
                 </div>
                 <div class="card">
-                    <h3>⏱️ Contrôle de concurrence</h3>
+                    <h3>Contrôle de concurrence</h3>
                     <p>Le groupe <code>concurrency: pages</code> empêche deux déploiements simultanés d'entrer en conflit.</p>
                 </div>
             </div>
@@ -278,7 +278,7 @@
 
 <footer>
     <div class="container">
-        <p>Réalisé par <a href="https://github.com/GuyMartial24">GuyMartial24</a> — Bonjour aux développeurs de Troyes 👋</p>
+        <p>Réalisé par <a href="https://github.com/GuyMartial24">GuyMartial24</a> — Bonjour aux développeurs de Troyes</p>
         <p>Page validée et déployée automatiquement par le pipeline CI/CD.</p>
     </div>
 </footer>
