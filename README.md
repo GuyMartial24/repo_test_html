@@ -8,8 +8,8 @@
 
 Ce dépôt est un projet de démonstration. L'objectif est de montrer comment mettre en place un pipeline **CI/CD** (intégration continue et déploiement continu) pour un site web statique, avec **GitHub Actions** et **GitHub Pages**.
 
-- À chaque modification du code, un contrôle automatique vérifie que le HTML est correct (**CI**).
-- Si ce contrôle réussit, le site est publié automatiquement sur GitHub Pages (**CD**), uniquement pour la branche `main`.
+- À chaque modification du code, des contrôles automatiques vérifient le HTML, le CSS et les liens internes (**CI**).
+- Si ces contrôles réussissent, le site est publié automatiquement sur GitHub Pages (**CD**), uniquement pour la branche `main`.
 
 Le site publié est la page `index.html` de ce dépôt : https://guymartial24.github.io/repo_test_html/
 
@@ -50,8 +50,15 @@ Ce job vérifie le code avant qu'il ne soit publié.
 | Étape | Rôle |
 |-------|------|
 | `actions/checkout@v4` | Récupère le code du dépôt |
+| `actions/setup-node@v4` | Installe Node.js 20 |
+| `actions/cache@v4` | Met en cache le dossier npm entre deux exécutions |
+| Installation des linters | Installe HTMLHint et Stylelint avec npm |
 | Vérification des fichiers | Contrôle que `README.md` existe |
 | `htmlhint "**/*.html"` | Analyse tous les fichiers HTML. Une erreur fait échouer le pipeline |
+| `stylelint "**/*.css"` | Analyse les fichiers CSS s'il y en a. Sinon, l'étape est ignorée |
+| `lycheeverse/lychee-action@v2` | Vérifie que les liens internes des pages HTML pointent vers des cibles existantes |
+
+Les liens externes ne sont pas testés. Un site tiers temporairement indisponible ferait échouer la CI sans raison liée au projet.
 
 ### 2. `deploy-pages` : déploiement continu
 
@@ -94,26 +101,19 @@ repo_test_html/
 
 ## Lancer la vérification en local
 
-Avant de pousser, on peut reproduire l'étape de CI :
+Avant de pousser, on peut reproduire les contrôles HTML et CSS :
 
 ```bash
-npm install -g htmlhint
+npm install -g htmlhint stylelint stylelint-config-standard
 htmlhint "**/*.html"
+stylelint "**/*.css" --config '{"extends": "stylelint-config-standard"}'
 ```
 
 Pour voir la page, il suffit d'ouvrir `index.html` dans un navigateur.
 
-## Pistes d'amélioration
-
-Ces points ne sont pas encore en place. Ce sont les prochaines étapes que je prévois :
-
-- Protéger la branche `main` pour exiger une Pull Request et une CI réussie avant tout merge.
-- Ajouter d'autres contrôles, par exemple un lint CSS (Stylelint) ou la vérification des liens cassés.
-- Mettre en cache les dépendances npm pour accélérer la CI.
-
 ## Technologies
 
-HTML5 · CSS3 · Git · GitHub · GitHub Actions · GitHub Pages · HTMLHint · Node.js / npm · YAML
+HTML5 · CSS3 · Git · GitHub · GitHub Actions · GitHub Pages · HTMLHint · Stylelint · Lychee · Node.js / npm · YAML
 
 ## Auteur
 

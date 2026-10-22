@@ -6,7 +6,6 @@ on:
   pull_request:
     branches: [ "main" ]
 
-# Autorisations nécessaires pour publier sur GitHub Pages
 permissions:
   contents: read
   pages: write
@@ -17,36 +16,60 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  # -----------------------------------------------
-  # 1. CI : Validation et vérification de la syntaxe
-  # -----------------------------------------------
   lint-and-test:
     runs-on: ubuntu-latest
     steps:
       - name: Récupérer le code source
         uses: actions/checkout@v4
 
-      - name: Vérifier la présence des fichiers obligatoires
+      - name: Installer Node.js avec mise en cache npm
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # Le dépôt n'a pas de package.json : la clé de cache est donc fixe (version de Node)
+      - name: Cache des modules npm
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-npm-node20
+          restore-keys: |
+            ${{ runner.os }}-npm-
+
+      - name: Installer les linters (HTML et CSS)
         run: |
-          echo "Vérification des fichiers..."
+          npm install -g htmlhint stylelint stylelint-config-standard
+
+      - name: 1. Valider la structure et fichiers obligatoires
+        run: |
           test -f README.md
           echo "README.md présent."
 
-      - name: Valider la syntaxe HTML
-        run: |
-          npm install -g htmlhint
-          htmlhint "**/*.html"
+      - name: 2. Valider le code HTML
+        run: htmlhint "**/*.html"
 
-  # -----------------------------------------------
-  # 2. CD : Déploiement automatique sur GitHub Pages
-  # -----------------------------------------------
+      - name: 3. Valider le code CSS (Stylelint)
+        run: |
+          if find . -name "*.css" -not -path "./.git/*" | grep -q .; then
+            stylelint "**/*.css" --config '{"extends": "stylelint-config-standard"}'
+          else
+            echo "Aucun fichier CSS à analyser."
+          fi
+
+      # Lychee vérifie les liens internes (ancres et fichiers locaux) des pages HTML.
+      # Les liens externes ne sont pas testés pour éviter les échecs dus à un site distant indisponible.
+      - name: 4. Vérifier les liens internes (lychee)
+        uses: lycheeverse/lychee-action@v2
+        with:
+          args: --no-progress --offline "**/*.html"
+          fail: true
+
   deploy-pages:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     needs: lint-and-test
-    # Déploiement actif uniquement après un push ou merge sur 'main'
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     steps:
       - name: Récupérer le code source
@@ -55,10 +78,10 @@ jobs:
       - name: Configurer GitHub Pages
         uses: actions/configure-pages@v5
 
-      - name: Uploader l'artefact du site
+      - name: Uploader l'artefact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: '.' # Déploie la racine du dépôt
+          path: '.'
 
       - name: Déployer vers GitHub Pages
         id: deployment
