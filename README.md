@@ -111,14 +111,6 @@ stylelint "**/*.css" --config '{"extends": "stylelint-config-standard"}'
 
 Pour voir la page, il suffit d'ouvrir `index.html` dans un navigateur.
 
-## Pistes d'amélioration
-
-Ces points ne sont pas encore en place. Ce sont les prochaines étapes que je prévois :
-
-- Protéger la branche `main` pour exiger une Pull Request et une CI réussie avant tout merge.
-- Tester aussi les liens externes, avec un contrôle séparé pour ne pas bloquer la CI.
-- Ajouter un `package.json` pour que le cache npm soit lié aux dépendances réelles.
-
 ## Technologies
 
 HTML5 · CSS3 · Git · GitHub · GitHub Actions · GitHub Pages · HTMLHint · Stylelint · Lychee · Node.js / npm · YAML
