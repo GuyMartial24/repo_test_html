@@ -1,0 +1,65 @@
+name: CI/CD Pipeline HTML
+
+on:
+  push:
+    branches: [ "main", "develop" ]
+  pull_request:
+    branches: [ "main" ]
+
+# Autorisations nécessaires pour publier sur GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  # -----------------------------------------------
+  # 1. CI : Validation et vérification de la syntaxe
+  # -----------------------------------------------
+  lint-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Récupérer le code source
+        uses: actions/checkout@v4
+
+      - name: Vérifier la présence des fichiers obligatoires
+        run: |
+          echo "Vérification des fichiers..."
+          test -f README.md
+          echo "README.md présent."
+
+      - name: Valider la syntaxe HTML
+        run: |
+          npm install -g htmlhint
+          htmlhint "**/*.html"
+
+  # -----------------------------------------------
+  # 2. CD : Déploiement automatique sur GitHub Pages
+  # -----------------------------------------------
+  deploy-pages:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: lint-and-test
+    # Déploiement actif uniquement après un push ou merge sur 'main'
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    steps:
+      - name: Récupérer le code source
+        uses: actions/checkout@v4
+
+      - name: Configurer GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Uploader l'artefact du site
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: '.' # Déploie la racine du dépôt
+
+      - name: Déployer vers GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
